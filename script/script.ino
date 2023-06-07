@@ -11,7 +11,32 @@
 #define RTCCLK 7
 #define RTCDAT 8
 #define RTCRST 9
-//static const unsigned char PROGMEM image_data_Saraarray[1024] = {
+
+#define LEFTBUTTON 4
+#define SELECTBUTTON 5
+#define RIGHTBUTTON 6
+
+
+static const unsigned char PROGMEM cow[] = {
+  0b00000100, 0b00001000, 
+  0b00000100, 0b11101000, 
+  0b00000011, 0b11110000, 
+  0b00001111, 0b11111100, 
+  0b00111110, 0b11110110, 
+  0b00111011, 0b11111001, 
+  0b00000011, 0b00000000, 
+  0b00000010, 0b11111110, 
+  0b00000101, 0b10010010, 
+  0b00111101, 0b11010110, 
+  0b00111101, 0b11111110, 
+  0b01111101, 0b11111100, 
+  0b10111110, 0b00000000, 
+  0b10111111, 0b11110000, 
+  0b10110111, 0b11110000, 
+  0b00100100, 0b10010000, 
+};
+
+
 
 
 Adafruit_SSD1306 display(128, 64, &Wire, OLED_RESET);
@@ -21,6 +46,22 @@ RtcDS1302<ThreeWire> Rtc(myWire);
 
 
 byte holdBuffer[3] = {0, 0, 0};
+
+void menuSelect() {
+
+  if (buttonPressed(LEFTBUTTON)) Serial.println("left button pressed");
+  if (buttonPressed(RIGHTBUTTON)) Serial.println("right button pressed");
+  if (buttonPressed(SELECTBUTTON)) Serial.println("select button pressed");
+}
+
+bool buttonPressed(int button) {
+  if (button < 4 || button > 6) return false;
+  if (holdBuffer[button-4] == 2) return true;
+  return false;
+}
+void homeScreen() {
+
+}
 
 void setup() {
   Serial.begin(115200);
@@ -33,10 +74,17 @@ void setup() {
   }
 
   pinMode(SPEAKER, OUTPUT);
+  
   if(!display.begin(SSD1306_SWITCHCAPVCC, SCREEN_ADDRESS)) {
     Serial.println(F("SSD1306 failed to start"));
     while (1);
   }
+  display.clearDisplay();
+
+  display.drawBitmap(
+    (display.width()  - 16) / 2,
+    (display.height() - 16) / 2,
+    cow, 16, 16, 1);
   display.display();
 
 
@@ -47,17 +95,14 @@ void loop() {
   
   for (int buttonPin=4; buttonPin<=6; buttonPin++) {
     if (digitalRead(buttonPin) == HIGH) {
-      holdBuffer[buttonPin-4] = min(3, holdBuffer[buttonPin-4] + 1);    
-
-      if (holdBuffer[buttonPin-4] == 2) {
-        Serial.print("Press event: button ");
-        Serial.println(buttonPin-4);
-      }
+      holdBuffer[buttonPin-4] = min(3, holdBuffer[buttonPin-4] + 1);
+      
+        
     } else {
       holdBuffer[buttonPin-4] = 0;
     }
-    
   }
+  menuSelect();
   delay(50);
   
 

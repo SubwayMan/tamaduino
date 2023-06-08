@@ -46,6 +46,8 @@ RtcDS1302<ThreeWire> Rtc(myWire);
 
 
 byte holdBuffer[3] = {0, 0, 0};
+byte hunger = 124;
+byte happiness = 67;
 
 void menuSelect() {
 
@@ -90,8 +92,17 @@ void setup() {
 
   display.setTextSize(1);      // Normal 1:1 pixel scale
   display.setTextColor(SSD1306_WHITE); // Draw white text
-  display.setCursor(104, 0);     // Start at top-left corner
+  display.setCursor(104, 0);     // Money
   display.print("9085");
+  // hunger, happy bars
+  display.setCursor(0, 0);
+  display.write(0x03);
+  display.setCursor(0, 9);
+  display.write(0x02);
+
+  display.drawRect(7, 2, 20, 5, 1);
+  display.drawRect(7, 9, 20, 5, 1);
+
   display.display();
 
 

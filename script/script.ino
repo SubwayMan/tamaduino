@@ -146,12 +146,16 @@ void homeLoop() {
   static byte menuTimer = 0;
   static bool menuActive = 0;
   static byte selected = 0;
+  int buttonY =  display.height()-6*menuPos;
 
   if (menuPos > 0) {
    for (int i=0; i < 5; i++) {
-      display.drawRoundRect(24*i + 8, display.height()-6*menuPos, 16, 16, 3, 1);
+      display.drawRoundRect(24*i+7, buttonY, 18, 18, 3, 1);
       if (i == selected) {
-        display.fillRoundRect(24*i + 8, display.height()-6*menuPos, 16, 16, 3, 1);        
+        display.fillRoundRect(24*i+7, buttonY, 18, 18, 3, 1);
+        display.drawBitmap(24*i+8, buttonY+1, MENUICONS[i], 16, 16, 0);        
+      } else {
+        display.drawBitmap(24*i+8, buttonY+1, MENUICONS[i], 16, 16, 1);        
       }
     }
   }

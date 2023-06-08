@@ -17,7 +17,7 @@
 #define RIGHTBUTTON 6
 
 
-static const unsigned char PROGMEM cow[] = {
+static const byte PROGMEM cow[] = {
   0b00000100, 0b00001000, 
   0b00000100, 0b11101000, 
   0b00000011, 0b11110000, 
@@ -35,9 +35,9 @@ static const unsigned char PROGMEM cow[] = {
   0b10110111, 0b11110000, 
   0b00100100, 0b10010000, 
 };
-
-
-
+static const byte PROGMEM coin[] = {
+  0x20, 0x70, 0xd8, 0x88, 0xd8, 0x70, 0x20
+};
 
 Adafruit_SSD1306 display(128, 64, &Wire, OLED_RESET);
 
@@ -85,6 +85,13 @@ void setup() {
     (display.width()  - 16) / 2,
     (display.height() - 16) / 2,
     cow, 16, 16, 1);
+  
+  display.drawBitmap(display.width()-31, 0, coin, 5, 7, 1);
+
+  display.setTextSize(1);      // Normal 1:1 pixel scale
+  display.setTextColor(SSD1306_WHITE); // Draw white text
+  display.setCursor(104, 0);     // Start at top-left corner
+  display.print("9085");
   display.display();
 
 

@@ -43,6 +43,7 @@ Adafruit_SSD1306 display(128, 64, &Wire, OLED_RESET);
 
 ThreeWire myWire(RTCDAT, RTCCLK, RTCRST); 
 RtcDS1302<ThreeWire> Rtc(myWire);
+RtcDateTime currentTime;
 
 
 byte holdBuffer[3] = {0, 0, 0};
@@ -74,9 +75,10 @@ bool buttonPressed(int button) {
 void drawHome() {
   display.clearDisplay();
 
+  // draw pet
   display.drawBitmap(
     (display.width()  - 16) / 2,
-    (display.height() - 16) / 2,
+    28,
     cow, 16, 16, 1);
   
   // draw currency
@@ -97,6 +99,12 @@ void drawHome() {
   display.drawRect(7, 9, 20, 5, 1);
   display.fillRect(8, 10, happiness/14, 3, 1);
 
+  // time
+  currentTime = Rtc.GetDateTime();
+  display.setCursor(49, 0);
+  display.print(currentTime.Hour());
+  display.write(0x3A);
+  display.print(currentTime.Minute());
 
 }
 

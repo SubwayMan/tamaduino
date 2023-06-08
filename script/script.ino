@@ -67,7 +67,7 @@ void menuSelect() {
 
 bool buttonPressed(int button) {
   if (button < 4 || button > 6) return false;
-  if (holdBuffer[button-4] == 2) return true;
+  if (holdBuffer[button-4] == 1) return true;
   return false;
 }
 
@@ -115,13 +115,20 @@ void homeLoop() {
     if (menuPos < 3) menuPos ++; // menu is moving up
     else {
       menuTimer ++;
-      if (menuTimer > 10) {
+      if (menuTimer > 15) {
         menuActive = 0;
       }
+      if (buttonPressed(LEFTBUTTON) || 
+      buttonPressed(RIGHTBUTTON) || 
+      buttonPressed(SELECTBUTTON)) { 
+        menuTimer = 0;
+      }
+
     }
-   
   } else {
-    if (buttonPressed(LEFTBUTTON) || buttonPressed(RIGHTBUTTON) || buttonPressed(SELECTBUTTON)) { // menu pulled up
+    if (buttonPressed(LEFTBUTTON) || 
+    buttonPressed(RIGHTBUTTON) || 
+    buttonPressed(SELECTBUTTON)) { // menu pulled up
       menuActive = 1;
       menuTimer = 0;
     } else {
@@ -157,7 +164,7 @@ void loop() {
   
   for (int buttonPin=4; buttonPin<=6; buttonPin++) {
     if (digitalRead(buttonPin) == HIGH) {
-      holdBuffer[buttonPin-4] = min(3, holdBuffer[buttonPin-4] + 1);        
+      holdBuffer[buttonPin-4] = min(2, holdBuffer[buttonPin-4] + 1);        
     } else {
       holdBuffer[buttonPin-4] = 0;
     }

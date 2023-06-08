@@ -48,6 +48,15 @@ RtcDS1302<ThreeWire> Rtc(myWire);
 byte holdBuffer[3] = {0, 0, 0};
 byte hunger = 124;
 byte happiness = 67;
+int money = 128;
+
+/*
+Map of values to currently active screens:
+0: home screen
+shop, inventory, game selection, games, etc.. 
+*/
+
+byte screen = 0;
 
 void menuSelect() {
 
@@ -61,8 +70,66 @@ bool buttonPressed(int button) {
   if (holdBuffer[button-4] == 2) return true;
   return false;
 }
-void homeScreen() {
 
+void drawHome() {
+  display.clearDisplay();
+
+  display.drawBitmap(
+    (display.width()  - 16) / 2,
+    (display.height() - 16) / 2,
+    cow, 16, 16, 1);
+  
+  // draw currency
+  display.drawBitmap(display.width()-31, 0, coin, 5, 7, 1);
+  display.setTextSize(1);      
+  display.setTextColor(SSD1306_WHITE); 
+  display.setCursor(104, 0);     
+  display.print(money);
+
+  // hunger, happy bars
+  display.setCursor(0, 0);
+  display.write(0x03);
+  display.drawRect(7, 2, 20, 5, 1);
+  display.fillRect(8, 3, hunger/14, 3, 1);
+
+  display.setCursor(0, 9);
+  display.write(0x02);
+  display.drawRect(7, 9, 20, 5, 1);
+  display.fillRect(8, 10, happiness/14, 3, 1);
+
+
+}
+
+void homeLoop() {
+  static byte menuPos = 0;
+  static byte menuTimer = 0;
+  static bool menuActive = 0;
+
+  if (menuPos > 0) {
+   for (int i=0; i < 5; i++) {
+      display.drawRoundRect(24*i + 8, display.height()-6*menuPos, 16, 16, 2, 1);
+    }
+  }
+
+  if (menuActive) {  
+    if (menuPos < 3) menuPos ++; // menu is moving up
+    else {
+      menuTimer ++;
+      if (menuTimer > 10) {
+        menuActive = 0;
+      }
+    }
+   
+  } else {
+    if (buttonPressed(LEFTBUTTON) || buttonPressed(RIGHTBUTTON) || buttonPressed(SELECTBUTTON)) { // menu pulled up
+      menuActive = 1;
+      menuTimer = 0;
+    } else {
+      if (menuPos > 0) { // menu is moving down
+        menuPos--;
+      }
+    }
+  }
 }
 
 void setup() {
@@ -81,36 +148,7 @@ void setup() {
     Serial.println(F("SSD1306 failed to start"));
     while (1);
   }
-  display.clearDisplay();
-
-  display.drawBitmap(
-    (display.width()  - 16) / 2,
-    (display.height() - 16) / 2,
-    cow, 16, 16, 1);
-  
-  display.drawBitmap(display.width()-31, 0, coin, 5, 7, 1);
-
-  display.setTextSize(1);      // Normal 1:1 pixel scale
-  display.setTextColor(SSD1306_WHITE); // Draw white text
-  display.setCursor(104, 0);     // Money
-  display.print("9085");
-  // hunger, happy bars
-  display.setCursor(0, 0);
-  display.write(0x03);
-  display.drawRect(7, 2, 20, 5, 1);
-  display.fillRect(8, 3, hunger/14, 3, 1);
-
-  display.setCursor(0, 9);
-  display.write(0x02);
-  display.drawRect(7, 9, 20, 5, 1);
-  display.fillRect(8, 10, happiness/14, 3, 1);
-
-
-
-
-
-  display.display();
-
+  drawHome();
 
 
 }
@@ -119,14 +157,22 @@ void loop() {
   
   for (int buttonPin=4; buttonPin<=6; buttonPin++) {
     if (digitalRead(buttonPin) == HIGH) {
-      holdBuffer[buttonPin-4] = min(3, holdBuffer[buttonPin-4] + 1);
-      
-        
+      holdBuffer[buttonPin-4] = min(3, holdBuffer[buttonPin-4] + 1);        
     } else {
       holdBuffer[buttonPin-4] = 0;
     }
   }
-  menuSelect();
+
+  switch (screen) {
+    case 0:
+      drawHome();
+      homeLoop();
+      break;
+    default:
+      Serial.println("Screen not found!");
+  }
+
+  display.display();
   delay(50);
   
 

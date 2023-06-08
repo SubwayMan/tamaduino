@@ -112,10 +112,14 @@ void homeLoop() {
   static byte menuPos = 0;
   static byte menuTimer = 0;
   static bool menuActive = 0;
+  static byte selected = 0;
 
   if (menuPos > 0) {
    for (int i=0; i < 5; i++) {
-      display.drawRoundRect(24*i + 8, display.height()-6*menuPos, 16, 16, 2, 1);
+      display.drawRoundRect(24*i + 8, display.height()-6*menuPos, 16, 16, 3, 1);
+      if (i == selected) {
+        display.fillRoundRect(24*i + 8, display.height()-6*menuPos, 16, 16, 3, 1);        
+      }
     }
   }
 
@@ -126,9 +130,16 @@ void homeLoop() {
       if (menuTimer > 15) {
         menuActive = 0;
       }
-      if (buttonPressed(LEFTBUTTON) || 
-      buttonPressed(RIGHTBUTTON) || 
-      buttonPressed(SELECTBUTTON)) { 
+      if (buttonPressed(LEFTBUTTON)) {
+        menuTimer = 0;
+        if (selected == 0) selected = 4;
+        else selected --;
+      }
+      if (buttonPressed(RIGHTBUTTON)) {
+        menuTimer = 0;
+        selected = (selected + 1) % 5;
+      }      
+      if (buttonPressed(SELECTBUTTON)) { 
         menuTimer = 0;
       }
 

@@ -97,11 +97,17 @@ void setup() {
   // hunger, happy bars
   display.setCursor(0, 0);
   display.write(0x03);
+  display.drawRect(7, 2, 20, 5, 1);
+  display.fillRect(8, 3, hunger/14, 3, 1);
+
   display.setCursor(0, 9);
   display.write(0x02);
-
-  display.drawRect(7, 2, 20, 5, 1);
   display.drawRect(7, 9, 20, 5, 1);
+  display.fillRect(8, 10, happiness/14, 3, 1);
+
+
+
+
 
   display.display();
 
